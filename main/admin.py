@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import ProductType, Genre, Product, Order, OrderItem, Cart, CartItem
+from .models import ProductType, Genre, Product, ProductVariant, Order, OrderItem, Cart, CartItem
 
 # Форма для ProductType
 class ProductTypeForm(forms.ModelForm):
@@ -14,18 +14,24 @@ class GenreForm(forms.ModelForm):
         model = Genre
         fields = ['name', 'slug']
 
+# Inline для вариантов товара
+class ProductVariantInline(admin.TabularInline):
+    model = ProductVariant
+    extra = 1  # Одна автоматическая строка
+    fields = ['product_type', 'price', 'stock']
+
 # Inline для элементов заказа
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    extra = 1
+    extra = 1  # Одна автоматическая строка
     readonly_fields = ['price']
-    raw_id_fields = ['product']
+    fields = ['product_variant', 'quantity', 'price']
 
 # Inline для элементов корзины
 class CartItemInline(admin.TabularInline):
     model = CartItem
-    extra = 1
-    raw_id_fields = ['product']
+    extra = 1  # Одна автоматическая строка
+    fields = ['product_variant', 'quantity']
 
 @admin.register(ProductType)
 class ProductTypeAdmin(admin.ModelAdmin):
@@ -38,7 +44,7 @@ class ProductTypeAdmin(admin.ModelAdmin):
 
     @admin.display(description="Количество товаров")
     def product_count(self, obj):
-        return obj.product_set.count()
+        return obj.productvariant_set.count()
     product_count.short_description = "Количество товаров"
 
 @admin.register(Genre)
@@ -57,20 +63,32 @@ class GenreAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ['title', 'artist', 'product_type', 'price', 'stock', 'get_genres']
-    list_filter = ['product_type', 'genre']
+    list_display = ['title', 'artist', 'get_product_types', 'get_genres']
+    list_filter = ['genre']
     search_fields = ['title', 'artist']
     prepopulated_fields = {'slug': ('title',)}
     filter_horizontal = ['genre']
     list_display_links = ['title', 'artist']
-    raw_id_fields = ['product_type']
+    inlines = [ProductVariantInline]
     readonly_fields = ['created_at', 'updated_at']
     date_hierarchy = 'created_at'
+
+    @admin.display(description="Типы товара")
+    def get_product_types(self, obj):
+        return ", ".join([pt.name for pt in obj.product_type.all()])
+    get_product_types.short_description = "Типы товара"
 
     @admin.display(description="Жанры")
     def get_genres(self, obj):
         return ", ".join([genre.name for genre in obj.genre.all()])
     get_genres.short_description = "Жанры"
+
+@admin.register(ProductVariant)
+class ProductVariantAdmin(admin.ModelAdmin):
+    list_display = ['product', 'product_type', 'price', 'stock']
+    list_filter = ['product_type']
+    search_fields = ['product__title', 'product_type__name']
+    raw_id_fields = ['product', 'product_type']
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
@@ -84,10 +102,10 @@ class OrderAdmin(admin.ModelAdmin):
 
 @admin.register(OrderItem)
 class OrderItemAdmin(admin.ModelAdmin):
-    list_display = ['order', 'product', 'quantity', 'price']
+    list_display = ['order', 'product_variant', 'quantity', 'price']
     list_filter = ['order__status']
-    search_fields = ['product__title']
-    raw_id_fields = ['order', 'product']
+    search_fields = ['product_variant__product__title']
+    fields = ['order', 'product_variant', 'quantity', 'price']
     readonly_fields = ['price']
 
 @admin.register(Cart)
@@ -106,7 +124,7 @@ class CartAdmin(admin.ModelAdmin):
 
 @admin.register(CartItem)
 class CartItemAdmin(admin.ModelAdmin):
-    list_display = ['cart', 'product', 'quantity']
+    list_display = ['cart', 'product_variant', 'quantity']
     list_filter = ['cart__created_at']
-    search_fields = ['product__title']
-    raw_id_fields = ['cart', 'product']
+    search_fields = ['product_variant__product__title']
+    fields = ['cart', 'product_variant', 'quantity']

@@ -55,7 +55,7 @@ ROOT_URLCONF = 'Course_FirstProject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['main/templates/main'],
+        'DIRS': ['main/templates/main', 'main/templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

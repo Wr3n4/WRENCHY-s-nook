@@ -30,10 +30,8 @@ class Genre(models.Model):
 class Product(models.Model):
     title = models.CharField(max_length=200, verbose_name="Название")
     artist = models.CharField(max_length=100, verbose_name="Исполнитель")
-    product_type = models.ForeignKey('ProductType', on_delete=models.PROTECT, verbose_name="Тип товара")
+    product_type = models.ManyToManyField('ProductType', through='ProductVariant', verbose_name="Типы товара")
     genre = models.ManyToManyField('Genre', verbose_name="Жанр")
-    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
-    stock = models.PositiveIntegerField(default=0, verbose_name="Количество на складе")
     description = models.TextField(blank=True, verbose_name="Описание")
     image = models.ImageField(upload_to='products/', blank=True, null=True, verbose_name="Изображение")
     slug = models.SlugField(max_length=200, unique=True, verbose_name="URL-имя")
@@ -50,6 +48,21 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse('product_detail', kwargs={'slug': self.slug})
+
+# Вариант товара (для разных типов с ценой и складом)
+class ProductVariant(models.Model):
+    product = models.ForeignKey('Product', on_delete=models.CASCADE, verbose_name="Товар")
+    product_type = models.ForeignKey('ProductType', on_delete=models.PROTECT, verbose_name="Тип товара")
+    price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена")
+    stock = models.PositiveIntegerField(default=0, verbose_name="Количество на складе")
+
+    class Meta:
+        verbose_name = "Вариант товара"
+        verbose_name_plural = "Варианты товара"
+        unique_together = ['product', 'product_type']  # Гарантирует уникальность комбинации товар+тип
+
+    def __str__(self):
+        return f"{self.product.title} ({self.product_type.name})"
 
 # Заказ
 class Order(models.Model):
@@ -74,7 +87,7 @@ class Order(models.Model):
 # Элемент заказа
 class OrderItem(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE, verbose_name="Заказ")
-    product = models.ForeignKey('Product', on_delete=models.PROTECT, verbose_name="Товар")
+    product_variant = models.ForeignKey('ProductVariant', on_delete=models.PROTECT, verbose_name="Вариант товара")
     quantity = models.PositiveIntegerField(verbose_name="Количество")
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Цена за единицу")
 
@@ -83,7 +96,7 @@ class OrderItem(models.Model):
         verbose_name_plural = "Элементы заказа"
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.title}"
+        return f"{self.quantity} x {self.product_variant}"
 
 # Корзина
 class Cart(models.Model):
@@ -101,7 +114,7 @@ class Cart(models.Model):
 # Элемент корзины
 class CartItem(models.Model):
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE, verbose_name="Корзина")
-    product = models.ForeignKey('Product', on_delete=models.CASCADE, verbose_name="Товар")
+    product_variant = models.ForeignKey('ProductVariant', on_delete=models.CASCADE, verbose_name="Вариант товара")
     quantity = models.PositiveIntegerField(default=1, verbose_name="Количество")
 
     class Meta:
@@ -109,4 +122,4 @@ class CartItem(models.Model):
         verbose_name_plural = "Элементы корзины"
 
     def __str__(self):
-        return f"{self.quantity} x {self.product.title}"
+        return f"{self.quantity} x {self.product_variant}"
