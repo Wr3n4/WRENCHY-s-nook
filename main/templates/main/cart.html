@@ -9,40 +9,44 @@
     <div class="container">
         <h1 class="text-light">Корзина</h1>
         {% if cart_items_with_subtotal %}
-            <table class="table table-dark">
-                <thead>
-                    <tr>
-                        <th>Товар</th>
-                        <th>Формат</th>
-                        <th>Количество</th>
-                        <th>Цена</th>
-                        <th>Сумма</th>
-                        <th>Действие</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for entry in cart_items_with_subtotal %}
+            <div class="table-responsive">
+                <table class="table table-dark table-striped">
+                    <thead>
                         <tr>
-                            <td>{{ entry.item.product_variant.product.title }}</td>
-                            <td>{{ entry.item.product_variant.product_type.name }}</td>
-                            <td>{{ entry.item.quantity }}</td>
-                            <td>{{ entry.item.product_variant.price }} руб.</td>
-                            <td>{{ entry.subtotal }} руб.</td>
-                            <td>
-                                <a href="{% url 'remove_from_cart' entry.item.id %}" class="btn btn-neon btn-sm">Удалить</a>
-                            </td>
+                            <th>Товар</th>
+                            <th>Формат</th>
+                            <th>Кол-во</th>
+                            <th>Цена</th>
+                            <th>Сумма</th>
+                            <th>Действие</th>
                         </tr>
-                    {% endfor %}
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td colspan="4" class="text-end">Итого:</td>
-                        <td>{{ total }} руб.</td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-            <a href="{% url 'checkout' %}" class="btn btn-neon">Оформить заказ</a>
+                    </thead>
+                    <tbody>
+                        {% for entry in cart_items_with_subtotal %}
+                            <tr>
+                                <td>{{ entry.item.product_variant.product.title }}</td>
+                                <td>{{ entry.item.product_variant.product_type.name }}</td>
+                                <td>{{ entry.item.quantity }}</td>
+                                <td>{{ entry.item.product_variant.price }} руб.</td>
+                                <td>{{ entry.subtotal }} руб.</td>
+                                <td>
+                                    <a href="{% url 'remove_from_cart' entry.item.id %}" class="btn btn-neon btn-sm">Удалить</a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="text-end">Итого:</td>
+                            <td>{{ total }} руб.</td>
+                            <td></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="d-grid gap-2 d-md-block mt-3">
+                <a href="{% url 'checkout' %}" class="btn btn-neon btn-lg w-100 w-md-auto">Оформить заказ</a>
+            </div>
         {% else %}
             <p class="text-subtle">Корзина пуста.</p>
         {% endif %}

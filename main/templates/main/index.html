@@ -10,7 +10,7 @@ WЯENCHY's nook
     <div class="container">
         <div class="row">
             <!-- Фильтры слева -->
-            <div class="col-md-3">
+            <div class="col-12 col-md-3">
                 <h4 class="text-light mb-4">Фильтры</h4>
                 <form method="get" class="mb-4">
                     <div class="mb-3">
@@ -44,8 +44,8 @@ WЯENCHY's nook
                 </form>
             </div>
             <!-- Список товаров -->
-            <div class="col-md-9">
-                <div class="row row-cols-1 row-cols-md-3 g-4">
+            <div class="col-12 col-md-9">
+                <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
                     {% for product in products %}
                         <div class="col">
                             <div class="card h-100 bg-dark text-light">
@@ -58,10 +58,10 @@ WЯENCHY's nook
                                         </div>
                                     {% endif %}
                                 </div>
-                                <div class="card-body">
-                                    <h5 class="card-title">{{ product.title }}</h5>
-                                    <p class="card-text">{{ product.artist }}</p>
-                                    <a href="{% url 'product_detail' product.slug %}" class="btn btn-neon">Подробнее</a>
+                                <div class="card-body p-2">
+                                    <h5 class="card-title mb-1">{{ product.title }}</h5>
+                                    <p class="card-text mb-1">{{ product.artist }}</p>
+                                    <a href="{% url 'product_detail' product.slug %}" class="btn btn-neon btn-sm w-100">Подробнее</a>
                                 </div>
                             </div>
                         </div>
@@ -79,7 +79,7 @@ WЯENCHY's nook
     <div class="container">
         <h2 class="text-center mb-4 text-white">Почему WЯENCHY's nook?</h2>
         <div class="row text-center">
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <div class="card h-100 bg-dark border-0 text-light">
                     <div class="card-body">
                         <h3 class="card-title">Редкие находки</h3>
@@ -87,7 +87,7 @@ WЯENCHY's nook
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <div class="card h-100 bg-dark border-0 text-light">
                     <div class="card-body">
                         <h3 class="card-title">Мгновенная доставка</h3>
@@ -95,7 +95,7 @@ WЯENCHY's nook
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <div class="card h-100 bg-dark border-0 text-light">
                     <div class="card-body">
                         <h3 class="card-title">Для меломанов</h3>

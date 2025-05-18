@@ -20,16 +20,16 @@
         }
         .navbar {
             background-color: #1c1c1c;
-            padding: 1.5rem 1rem;
+            padding: 1rem;
         }
         .navbar-brand {
-            font-size: 2rem;
+            font-size: 1.5rem;
             font-weight: bold;
             color: #00ff88 !important;
         }
         .nav-link {
             color: #b0b0b0 !important;
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
         .nav-link:hover {
             color: #00ff88 !important;
@@ -51,23 +51,26 @@
         .cart-icon, .user-icon {
             position: relative;
             color: #b0b0b0;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
         }
         .cart-icon:hover, .user-icon:hover {
             color: #00ff88;
         }
         .cart-count, .order-count {
             position: absolute;
-            top: -8px;
-            right: -8px;
+            top: -5px;
+            right: -5px;
             background-color: #00ff88;
             color: #121212;
             border-radius: 50%;
-            width: 18px;
-            height: 18px;
+            width: 16px;
+            height: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 12px;
+            font-size: 10px;
         }
         .toast-container {
             position: fixed;
@@ -123,14 +126,15 @@
             background-color: #2a2a2a;
         }
         .search-form {
-            margin-left: 1rem;
-            margin-right: 1rem;
+            margin: 0 0.5rem;
             flex-grow: 1;
+            max-width: 200px;
         }
         .search-form input {
             background-color: #2a2a2a;
             border: 1px solid #00ff88;
             color: #e0e0e0;
+            font-size: 0.9rem;
         }
         .search-form input::placeholder {
             color: #b0b0b0;
@@ -139,14 +143,117 @@
             background-color: #00ff88;
             border: none;
             color: #121212;
+            padding: 0.25rem 0.5rem;
+            font-size: 0.9rem;
         }
         .search-form button:hover {
             background-color: #00cc70;
         }
-        /* Новый кастомный класс для приглушённого, но читаемого текста */
         .text-subtle {
-            color: #cccccc !important; /* Светло-серый для хорошей читаемости */
-            opacity: 0.9; /* Лёгкая прозрачность для "приглушённого" эффекта */
+            color: #cccccc !important;
+            opacity: 0.9;
+        }
+        /* Адаптивность шапки */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.2rem;
+            }
+            .nav-link {
+                font-size: 0.9rem;
+            }
+            .search-form {
+                max-width: 150px;
+            }
+            .search-form input {
+                font-size: 0.8rem;
+            }
+            .search-form button {
+                font-size: 0.8rem;
+            }
+            .cart-icon, .user-icon {
+                font-size: 1rem;
+            }
+            .btn-neon {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.9rem;
+            }
+            .cart-icon span, .user-icon span {
+                display: inline; /* Показываем текст на мобильных */
+                margin-left: 0.5rem;
+                font-size: 0.9rem;
+                color: #b0b0b0;
+            }
+        }
+        @media (max-width: 576px) {
+            .navbar-nav.me-auto {
+                display: none;
+            }
+            .search-form {
+                max-width: 100%;
+                margin: 0.5rem 0;
+            }
+            .d-flex.align-items-center {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .btn-neon {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+            .cart-icon span, .user-icon span {
+                display: inline; /* Убеждаемся, что текст виден в свёрнутом меню */
+            }
+        }
+        /* Увеличение строки поиска на компьютерах */
+        @media (min-width: 768px) {
+            .search-form {
+                max-width: 300px; /* Увеличиваем ширину на десктопах */
+            }
+            .search-form input {
+                font-size: 1rem;
+            }
+            .search-form button {
+                font-size: 1rem;
+                padding: 0.3rem 0.7rem;
+            }
+            .cart-icon span, .user-icon span {
+                display: none; /* Скрываем текст на десктопах */
+            }
+        }
+        /* Адаптивность страницы товара */
+        @media (max-width: 768px) {
+            .product-image-container {
+                padding-top: 75%; /* Уменьшаем высоту изображения */
+            }
+            .product-title {
+                font-size: 1.5rem;
+            }
+            .product-artist {
+                font-size: 1.2rem;
+            }
+            .product-description {
+                font-size: 0.9rem;
+            }
+            .form-label {
+                font-size: 0.9rem;
+            }
+        }
+        @media (max-width: 576px) {
+            .product-image-container {
+                padding-top: 50%; /* Ещё сильнее уменьшаем высоту */
+            }
+            .product-title {
+                font-size: 1.2rem;
+            }
+            .product-artist {
+                font-size: 1rem;
+            }
+            .product-description {
+                font-size: 0.8rem;
+            }
+            .form-label {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
@@ -161,19 +268,20 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'faqs' %}">FAQ</a>
+                        <a class="nav-link d-none d-md-block" href="{% url 'faqs' %}">FAQ</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'about' %}">О нас</a>
+                        <a class="nav-link d-none d-md-block" href="{% url 'about' %}">О нас</a>
                     </li>
                 </ul>
                 <form class="search-form d-flex" method="get" action="{% url 'search' %}">
-                    <input class="form-control me-2" type="search" placeholder="Поиск по названию или исполнителю" aria-label="Search" name="q">
+                    <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Search" name="q">
                     <button class="btn" type="submit"><i class="fas fa-search"></i></button>
                 </form>
                 <div class="d-flex align-items-center">
                     <a href="{% url 'cart' %}" class="nav-link cart-icon me-3">
                         <i class="fas fa-shopping-cart"></i>
+                        <span>Корзина</span>
                         {% if cart_items_count > 0 %}
                             <span class="cart-count">{{ cart_items_count }}</span>
                         {% endif %}
@@ -181,6 +289,7 @@
                     {% if user.is_authenticated %}
                         <a href="{% url 'orders' %}" class="nav-link user-icon me-3">
                             <i class="fas fa-user"></i>
+                            <span>Заказы</span>
                             {% with orders_count=order_count %}
                                 {% if orders_count > 0 %}
                                     <span class="order-count">{{ orders_count }}</span>
