@@ -1,10 +1,109 @@
 {% extends 'base.html' %}
 
 {% block title %}
-WЯECNHY's vinyl
+WЯENCHY's nook
 {% endblock %}
 
 {% block content %}
-<h1>Портал в мир винила</h1>
-<p>Мы не просто любим, мы живём музыкой.</p>
+<!-- Каталог с фильтрами слева -->
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Фильтры слева -->
+            <div class="col-md-3">
+                <h4 class="text-light mb-4">Фильтры</h4>
+                <form method="get" class="mb-4">
+                    <div class="mb-3">
+                        <label for="genre" class="form-label text-light">Жанр</label>
+                        <select name="genre" id="genre" class="form-select bg-dark text-light">
+                            <option value="" {% if not selected_genre %}selected{% endif %}>Все жанры</option>
+                            {% for genre in genres %}
+                                <option value="{{ genre.id }}" {% if selected_genre == genre.id|stringformat:"s" %}selected{% endif %}>{{ genre.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="type" class="form-label text-light">Тип</label>
+                        <select name="type" id="type" class="form-select bg-dark text-light">
+                            <option value="" {% if not selected_type %}selected{% endif %}>Все типы</option>
+                            {% for product_type in product_types %}
+                                <option value="{{ product_type.id }}" {% if selected_type == product_type.id|stringformat:"s" %}selected{% endif %}>{{ product_type.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="artist" class="form-label text-light">Исполнитель</label>
+                        <select name="artist" id="artist" class="form-select bg-dark text-light">
+                            <option value="" {% if not selected_artist %}selected{% endif %}>Все исполнители</option>
+                            {% for artist in artists %}
+                                <option value="{{ artist }}" {% if selected_artist|lower == artist|lower %}selected{% endif %}>{{ artist }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-neon w-100">Фильтровать</button>
+                </form>
+            </div>
+            <!-- Список товаров -->
+            <div class="col-md-9">
+                <div class="row row-cols-1 row-cols-md-3 g-4">
+                    {% for product in products %}
+                        <div class="col">
+                            <div class="card h-100 bg-dark text-light">
+                                <div class="product-image-container">
+                                    {% if product.image %}
+                                        <img src="{{ product.image.url }}" class="product-image" alt="{{ product.title }}">
+                                    {% else %}
+                                        <div class="no-image">
+                                            <span>Нет изображения</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ product.title }}</h5>
+                                    <p class="card-text">{{ product.artist }}</p>
+                                    <a href="{% url 'product_detail' product.slug %}" class="btn btn-neon">Подробнее</a>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <p class="text-subtle">Товаров по выбранным фильтрам не найдено.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Почему мы -->
+<section class="py-5 bg-dark">
+    <div class="container">
+        <h2 class="text-center mb-4 text-white">Почему WЯENCHY's nook?</h2>
+        <div class="row text-center">
+            <div class="col-md-4">
+                <div class="card h-100 bg-dark border-0 text-light">
+                    <div class="card-body">
+                        <h3 class="card-title">Редкие находки</h3>
+                        <p class="card-text">Винил, инструменты, аксессуары.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 bg-dark border-0 text-light">
+                    <div class="card-body">
+                        <h3 class="card-title">Мгновенная доставка</h3>
+                        <p class="card-text">Ваши заказы — сразу к вам.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 bg-dark border-0 text-light">
+                    <div class="card-body">
+                        <h3 class="card-title">Для меломанов</h3>
+                        <p class="card-text">Создано с душой.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 {% endblock %}

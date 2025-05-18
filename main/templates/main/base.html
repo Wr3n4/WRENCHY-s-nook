@@ -1,26 +1,239 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}WЯENCHY's nook{% endblock %}</title>
+    <!-- Bootstrap 5.3.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <!-- Кастомные стили -->
+    <style>
+        body {
+            background-color: #121212;
+            color: #e0e0e0;
+            font-family: 'Arial', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .navbar {
+            background-color: #1c1c1c;
+            padding: 1.5rem 1rem;
+        }
+        .navbar-brand {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff88 !important;
+        }
+        .nav-link {
+            color: #b0b0b0 !important;
+            font-size: 1.1rem;
+        }
+        .nav-link:hover {
+            color: #00ff88 !important;
+        }
+        .btn-neon {
+            border-color: #00ff88;
+            color: #00ff88;
+        }
+        .btn-neon:hover {
+            background-color: #00ff88;
+            color: #121212;
+        }
+        footer {
+            background-color: #1c1c1c;
+            color: #b0b0b0;
+            padding: 1rem 0;
+            margin-top: auto;
+        }
+        .cart-icon, .user-icon {
+            position: relative;
+            color: #b0b0b0;
+        }
+        .cart-icon:hover, .user-icon:hover {
+            color: #00ff88;
+        }
+        .cart-count, .order-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: #00ff88;
+            color: #121212;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1050;
+            max-width: 300px;
+        }
+        .toast {
+            background-color: #1c1c1c;
+            color: #e0e0e0;
+            border: 1px solid #00ff88;
+            border-radius: 5px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        .toast .btn-close {
+            color: #e0e0e0;
+            opacity: 1;
+        }
+        .toast-success {
+            background-color: #003300;
+        }
+        .toast-warning {
+            background-color: #663300;
+        }
+        main {
+            flex: 1 0 auto;
+        }
+        .product-image-container {
+            width: 100%;
+            padding-top: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+        .product-image-container img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .product-image-container .no-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #2a2a2a;
+        }
+        .search-form {
+            margin-left: 1rem;
+            margin-right: 1rem;
+            flex-grow: 1;
+        }
+        .search-form input {
+            background-color: #2a2a2a;
+            border: 1px solid #00ff88;
+            color: #e0e0e0;
+        }
+        .search-form input::placeholder {
+            color: #b0b0b0;
+        }
+        .search-form button {
+            background-color: #00ff88;
+            border: none;
+            color: #121212;
+        }
+        .search-form button:hover {
+            background-color: #00cc70;
+        }
+        /* Новый кастомный класс для приглушённого, но читаемого текста */
+        .text-subtle {
+            color: #cccccc !important; /* Светло-серый для хорошей читаемости */
+            opacity: 0.9; /* Лёгкая прозрачность для "приглушённого" эффекта */
+        }
+    </style>
 </head>
 <body>
-    <header class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between py-3 mb-4 border-bottom">
-        <div class="col-md-3 mb-2 mb-md-0"> <a href="/" class="d-inline-flex link-body-emphasis text-decoration-none">
-            <svg class="bi" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use>
-            </svg> </a>
-        <h5 class="my-0 mr-md-auto font-weight-normal">WЯENCHY's cave</h5>
+    <!-- Навигация -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{% url 'home' %}">WЯENCHY's nook</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'faqs' %}">FAQ</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'about' %}">О нас</a>
+                    </li>
+                </ul>
+                <form class="search-form d-flex" method="get" action="{% url 'search' %}">
+                    <input class="form-control me-2" type="search" placeholder="Поиск по названию или исполнителю" aria-label="Search" name="q">
+                    <button class="btn" type="submit"><i class="fas fa-search"></i></button>
+                </form>
+                <div class="d-flex align-items-center">
+                    <a href="{% url 'cart' %}" class="nav-link cart-icon me-3">
+                        <i class="fas fa-shopping-cart"></i>
+                        {% if cart_items_count > 0 %}
+                            <span class="cart-count">{{ cart_items_count }}</span>
+                        {% endif %}
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'orders' %}" class="nav-link user-icon me-3">
+                            <i class="fas fa-user"></i>
+                            {% with orders_count=order_count %}
+                                {% if orders_count > 0 %}
+                                    <span class="order-count">{{ orders_count }}</span>
+                                {% endif %}
+                            {% endwith %}
+                        </a>
+                        <a href="{% url 'logout' %}" class="btn btn-outline btn-neon me-2">Выход</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline btn-neon me-2">Вход</a>
+                        <a href="{% url 'register' %}" class="btn btn-outline btn-neon">Регистрация</a>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        <ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
-        <li><a href="{% url 'home' %}" class="nav-link px-2 link-secondary">Home</a></li>
-        <li><a href="#" class="nav-link px-2">Features</a></li>
-        <li><a href="#" class="nav-link px-2">Pricing</a></li>
-        <li><a href="#" class="nav-link px-2">FAQs</a></li>
-        <li><a href="{% url 'about' %}" class="nav-link px-2">About</a></li>
-    </ul> <div class="col-md-3 text-end">
-        <button type="button" class="btn btn-outline-primary me-2">Вход</button>
-        <button type="button" class="btn btn-primary">Регистрация</button> </div> </header>
-    {% block content %}{% endblock %}
+    </nav>
+
+    <!-- Уведомления справа снизу -->
+    <div class="toast-container" id="toastContainer">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="toast {% if message.tags == 'success' %}toast-success{% elif message.tags == 'warning' %}toast-warning{% endif %}" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            {{ message }}
+                        </div>
+                        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Контент -->
+    <main class="container py-5">
+        {% block content %}
+        {% endblock %}
+    </main>
+
+    <!-- Футер -->
+    <footer class="text-center">
+        <div class="container">
+            <p>© 2025 WЯENCHY's nook. Музыка — наша страсть.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5.3.3 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var toastElList = document.querySelectorAll('.toast');
+            var toastList = [...toastElList].map(toastEl => new bootstrap.Toast(toastEl, {delay: 5000}));
+            toastList.forEach(toast => toast.show());
+        });
+    </script>
 </body>
 </html>

@@ -2,35 +2,30 @@ from django.contrib import admin
 from django import forms
 from .models import ProductType, Genre, Product, ProductVariant, Order, OrderItem, Cart, CartItem
 
-# Форма для ProductType
 class ProductTypeForm(forms.ModelForm):
     class Meta:
         model = ProductType
         fields = ['name', 'slug']
 
-# Форма для Genre
 class GenreForm(forms.ModelForm):
     class Meta:
         model = Genre
         fields = ['name', 'slug']
 
-# Inline для вариантов товара
 class ProductVariantInline(admin.TabularInline):
     model = ProductVariant
-    extra = 1  # Одна автоматическая строка
+    extra = 1
     fields = ['product_type', 'price', 'stock']
 
-# Inline для элементов заказа
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
-    extra = 1  # Одна автоматическая строка
+    extra = 1
     readonly_fields = ['price']
     fields = ['product_variant', 'quantity', 'price']
 
-# Inline для элементов корзины
 class CartItemInline(admin.TabularInline):
     model = CartItem
-    extra = 1  # Одна автоматическая строка
+    extra = 1
     fields = ['product_variant', 'quantity']
 
 @admin.register(ProductType)

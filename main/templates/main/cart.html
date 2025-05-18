@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Корзина | WЯENCHY's nook
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h1 class="text-light">Корзина</h1>
+        {% if cart_items_with_subtotal %}
+            <table class="table table-dark">
+                <thead>
+                    <tr>
+                        <th>Товар</th>
+                        <th>Формат</th>
+                        <th>Количество</th>
+                        <th>Цена</th>
+                        <th>Сумма</th>
+                        <th>Действие</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for entry in cart_items_with_subtotal %}
+                        <tr>
+                            <td>{{ entry.item.product_variant.product.title }}</td>
+                            <td>{{ entry.item.product_variant.product_type.name }}</td>
+                            <td>{{ entry.item.quantity }}</td>
+                            <td>{{ entry.item.product_variant.price }} руб.</td>
+                            <td>{{ entry.subtotal }} руб.</td>
+                            <td>
+                                <a href="{% url 'remove_from_cart' entry.item.id %}" class="btn btn-neon btn-sm">Удалить</a>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4" class="text-end">Итого:</td>
+                        <td>{{ total }} руб.</td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <a href="{% url 'checkout' %}" class="btn btn-neon">Оформить заказ</a>
+        {% else %}
+            <p class="text-subtle">Корзина пуста.</p>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

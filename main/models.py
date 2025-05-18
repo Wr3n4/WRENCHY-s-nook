@@ -2,7 +2,6 @@ from django.db import models
 from django.urls import reverse
 from django.contrib.auth.models import User
 
-# Тип товара (Винил, Кассета и т.д.)
 class ProductType(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Тип товара")
     slug = models.SlugField(max_length=50, unique=True, verbose_name="URL-имя")
@@ -14,7 +13,6 @@ class ProductType(models.Model):
     def __str__(self):
         return self.name
 
-# Жанр музыки
 class Genre(models.Model):
     name = models.CharField(max_length=50, unique=True, verbose_name="Жанр")
     slug = models.SlugField(max_length=50, unique=True, verbose_name="URL-имя")
@@ -26,7 +24,6 @@ class Genre(models.Model):
     def __str__(self):
         return self.name
 
-# Музыкальный товар
 class Product(models.Model):
     title = models.CharField(max_length=200, verbose_name="Название")
     artist = models.CharField(max_length=100, verbose_name="Исполнитель")
@@ -49,7 +46,6 @@ class Product(models.Model):
     def get_absolute_url(self):
         return reverse('product_detail', kwargs={'slug': self.slug})
 
-# Вариант товара (для разных типов с ценой и складом)
 class ProductVariant(models.Model):
     product = models.ForeignKey('Product', on_delete=models.CASCADE, verbose_name="Товар")
     product_type = models.ForeignKey('ProductType', on_delete=models.PROTECT, verbose_name="Тип товара")
@@ -59,12 +55,11 @@ class ProductVariant(models.Model):
     class Meta:
         verbose_name = "Вариант товара"
         verbose_name_plural = "Варианты товара"
-        unique_together = ['product', 'product_type']  # Гарантирует уникальность комбинации товар+тип
+        unique_together = ['product', 'product_type']
 
     def __str__(self):
         return f"{self.product.title} ({self.product_type.name})"
 
-# Заказ
 class Order(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Пользователь")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
@@ -84,7 +79,6 @@ class Order(models.Model):
     def __str__(self):
         return f"Заказ #{self.id} от {self.user.username}"
 
-# Элемент заказа
 class OrderItem(models.Model):
     order = models.ForeignKey('Order', on_delete=models.CASCADE, verbose_name="Заказ")
     product_variant = models.ForeignKey('ProductVariant', on_delete=models.PROTECT, verbose_name="Вариант товара")
@@ -98,7 +92,6 @@ class OrderItem(models.Model):
     def __str__(self):
         return f"{self.quantity} x {self.product_variant}"
 
-# Корзина
 class Cart(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name="Пользователь")
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
@@ -111,7 +104,6 @@ class Cart(models.Model):
     def __str__(self):
         return f"Корзина {self.user.username}"
 
-# Элемент корзины
 class CartItem(models.Model):
     cart = models.ForeignKey('Cart', on_delete=models.CASCADE, verbose_name="Корзина")
     product_variant = models.ForeignKey('ProductVariant', on_delete=models.CASCADE, verbose_name="Вариант товара")

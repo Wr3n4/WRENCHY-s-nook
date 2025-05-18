@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Удаление заказа | WЯENCHY's nook
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h1 class="text-light">Подтверждение удаления</h1>
+        <p class="text-subtle">Вы уверены, что хотите удалить заказ #{{ order.id }}?</p>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-neon">Да, удалить</button>
+            <a href="{% url 'orders' %}" class="btn btn-secondary">Нет, отменить</a>
+        </form>
+    </div>
+</section>
+{% endblock %}
