@@ -178,7 +178,7 @@
                 font-size: 0.9rem;
             }
             .cart-icon span, .user-icon span {
-                display: inline; /* Показываем текст на мобильных */
+                display: inline;
                 margin-left: 0.5rem;
                 font-size: 0.9rem;
                 color: #b0b0b0;
@@ -201,13 +201,13 @@
                 margin-bottom: 0.5rem;
             }
             .cart-icon span, .user-icon span {
-                display: inline; /* Убеждаемся, что текст виден в свёрнутом меню */
+                display: inline;
             }
         }
         /* Увеличение строки поиска на компьютерах */
         @media (min-width: 768px) {
             .search-form {
-                max-width: 300px; /* Увеличиваем ширину на десктопах */
+                max-width: 300px;
             }
             .search-form input {
                 font-size: 1rem;
@@ -217,13 +217,13 @@
                 padding: 0.3rem 0.7rem;
             }
             .cart-icon span, .user-icon span {
-                display: none; /* Скрываем текст на десктопах */
+                display: none;
             }
         }
         /* Адаптивность страницы товара */
         @media (max-width: 768px) {
             .product-image-container {
-                padding-top: 75%; /* Уменьшаем высоту изображения */
+                padding-top: 75%;
             }
             .product-title {
                 font-size: 1.5rem;
@@ -240,7 +240,7 @@
         }
         @media (max-width: 576px) {
             .product-image-container {
-                padding-top: 50%; /* Ещё сильнее уменьшаем высоту */
+                padding-top: 50%;
             }
             .product-title {
                 font-size: 1.2rem;
@@ -268,6 +268,9 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'playlists' %}">Подборки</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link d-none d-md-block" href="{% url 'faqs' %}">FAQ</a>
                     </li>
                     <li class="nav-item">
@@ -275,7 +278,7 @@
                     </li>
                 </ul>
                 <form class="search-form d-flex" method="get" action="{% url 'search' %}">
-                    <input class="form-control me-2" type="search" placeholder="Поиск" aria-label="Search" name="q">
+                    <input class="form-control me-2" type="search" placeholder="Поиск по названию или исполнителю" aria-label="Search" name="q">
                     <button class="btn" type="submit"><i class="fas fa-search"></i></button>
                 </form>
                 <div class="d-flex align-items-center">

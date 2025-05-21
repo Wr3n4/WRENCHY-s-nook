@@ -6,6 +6,7 @@ from django.db import models
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 
+
 def home(request):
     genres = Genre.objects.all()
     product_types = ProductType.objects.all()
@@ -50,11 +51,41 @@ def home(request):
         'artists': artists,
     })
 
+
 def faqs(request):
     return render(request, 'main/faqs.html')
 
+
 def about(request):
     return render(request, 'main/about.html')
+
+
+def playlists_view(request):
+    # QuerySet 1: Товары жанра "Рок", отсортированные по дате добавления (новые первыми)
+    rock_products = Product.objects.filter(genre__name="Рок").order_by('-created_at')[:5]
+
+    # QuerySet 2: Товары жанра "Джаз", отсортированные по дате добавления (новые первыми)
+    jazz_products = Product.objects.filter(genre__name="Джаз").order_by('-created_at')[:5]
+
+    # QuerySet 3: Товары жанра "Классика", отсортированные по цене (самые дорогие)
+    classical_products = Product.objects.filter(genre__name="Классика").prefetch_related('productvariant_set').order_by(
+        '-productvariant__price')[:5]
+
+    # Подсчёт количества товаров в корзине для отображения в шапке
+    cart_items_count = 0
+    if request.user.is_authenticated:
+        cart = Cart.objects.filter(user=request.user).first()
+        if cart:
+            cart_items_count = CartItem.objects.filter(cart=cart).aggregate(total=models.Sum('quantity'))['total'] or 0
+
+    context = {
+        'rock_products': rock_products,
+        'jazz_products': jazz_products,
+        'classical_products': classical_products,
+        'cart_items_count': cart_items_count,
+    }
+    return render(request, 'playlists.html', context)
+
 
 def search(request):
     query = request.GET.get('q', '')
@@ -86,9 +117,11 @@ def search(request):
         'artists': Product.objects.values_list('artist', flat=True).distinct(),
     })
 
+
 def product_detail(request, slug):
     product = Product.objects.get(slug=slug)
     return render(request, 'main/product_detail.html', {'product': product})
+
 
 @login_required
 def add_to_cart(request, slug):
@@ -116,6 +149,7 @@ def add_to_cart(request, slug):
         messages.success(request, f"Добавлено в корзину: {product.title} ({variant.product_type.name})")
     return redirect('home')
 
+
 @login_required
 def cart(request):
     cart = Cart.objects.filter(user=request.user).first()
@@ -127,6 +161,7 @@ def cart(request):
     total = sum(item['subtotal'] for item in cart_items_with_subtotal)
     return render(request, 'main/cart.html', {'cart_items_with_subtotal': cart_items_with_subtotal, 'total': total})
 
+
 @login_required
 def remove_from_cart(request, item_id):
     cart_item = CartItem.objects.get(id=item_id, cart__user=request.user)
@@ -137,6 +172,7 @@ def remove_from_cart(request, item_id):
     cart_item.delete()
     return redirect('cart')
 
+
 @login_required
 def checkout(request):
     cart = Cart.objects.filter(user=request.user).first()
@@ -145,7 +181,8 @@ def checkout(request):
         total = 0
         for item in CartItem.objects.filter(cart=cart):
             price = item.product_variant.price * item.quantity
-            OrderItem.objects.create(order=order, product_variant=item.product_variant, quantity=item.quantity, price=price)
+            OrderItem.objects.create(order=order, product_variant=item.product_variant, quantity=item.quantity,
+                                     price=price)
             total += price
         order.total_price = total
         order.save()
@@ -155,6 +192,7 @@ def checkout(request):
     else:
         messages.warning(request, 'Корзина пуста. Добавьте товары перед оформлением заказа.')
         return redirect('cart')
+
 
 def register_view(request):
     if request.method == 'POST':
@@ -167,10 +205,12 @@ def register_view(request):
         form = UserCreationForm()
     return render(request, 'main/register.html', {'form': form})
 
+
 @login_required
 def orders(request):
     user_orders = Order.objects.filter(user=request.user).order_by('-created_at')
     return render(request, 'main/orders.html', {'orders': user_orders})
+
 
 @login_required
 def delete_order(request, order_id):
@@ -184,6 +224,7 @@ def delete_order(request, order_id):
         messages.success(request, f"Заказ #{order_id} успешно удалён. Товары возвращены на склад.")
         return redirect('orders')
     return render(request, 'main/confirm_delete.html', {'order': order})
+
 
 @login_required
 def custom_logout(request):

@@ -62,7 +62,7 @@ class ProductAdmin(admin.ModelAdmin):
     list_filter = ['genre']
     search_fields = ['title', 'artist']
     prepopulated_fields = {'slug': ('title',)}
-    filter_horizontal = ['genre']
+    filter_horizontal = ['genre',]
     list_display_links = ['title', 'artist']
     inlines = [ProductVariantInline]
     readonly_fields = ['created_at', 'updated_at']
