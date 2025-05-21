@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Подборки | WЯENCHY's nook
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h1 class="text-light mb-4">Подборки</h1>
+
+        <!-- Подборка 1: Рок -->
+        <div class="mb-5">
+            <h2 class="text-light">Топ-5 рок-альбомов</h2>
+            <p class="text-subtle">Самые популярные рок-альбомы, доступные в нашем магазине.</p>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3">
+                {% for product in rock_products %}
+                    <div class="col">
+                        <div class="card h-100 bg-dark text-light">
+                            <div class="product-image-container">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" class="product-image" alt="{{ product.title }}">
+                                {% else %}
+                                    <div class="no-image">
+                                        <span>Нет изображения</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body p-2">
+                                <h5 class="card-title mb-1">{{ product.title }}</h5>
+                                <p class="card-text mb-1">{{ product.artist }}</p>
+                                <p class="card-text mb-2">
+                                    {% for variant in product.productvariant_set.all %}
+                                        {{ variant.price }} руб. (в наличии: {{ variant.stock }})
+                                        {% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <a href="{% url 'product_detail' product.slug %}" class="btn btn-neon btn-sm w-100">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-subtle">Товаров в этой подборке нет.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Подборка 2: Джаз -->
+        <div class="mb-5">
+            <h2 class="text-light">Новые джазовые релизы</h2>
+            <p class="text-subtle">Свежие джазовые альбомы, добавленные недавно.</p>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3">
+                {% for product in jazz_products %}
+                    <div class="col">
+                        <div class="card h-100 bg-dark text-light">
+                            <div class="product-image-container">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" class="product-image" alt="{{ product.title }}">
+                                {% else %}
+                                    <div class="no-image">
+                                        <span>Нет изображения</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body p-2">
+                                <h5 class="card-title mb-1">{{ product.title }}</h5>
+                                <p class="card-text mb-1">{{ product.artist }}</p>
+                                <p class="card-text mb-2">
+                                    {% for variant in product.productvariant_set.all %}
+                                        {{ variant.price }} руб. (в наличии: {{ variant.stock }})
+                                        {% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <a href="{% url 'product_detail' product.slug %}" class="btn btn-neon btn-sm w-100">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-subtle">Товаров в этой подборке нет.</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Подборка 3: Классика -->
+        <div class="mb-5">
+            <h2 class="text-light">Премиум-классика</h2>
+            <p class="text-subtle">Самые дорогие и эксклюзивные классические записи.</p>
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-5 g-3">
+                {% for product in classical_products %}
+                    <div class="col">
+                        <div class="card h-100 bg-dark text-light">
+                            <div class="product-image-container">
+                                {% if product.image %}
+                                    <img src="{{ product.image.url }}" class="product-image" alt="{{ product.title }}">
+                                {% else %}
+                                    <div class="no-image">
+                                        <span>Нет изображения</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="card-body p-2">
+                                <h5 class="card-title mb-1">{{ product.title }}</h5>
+                                <p class="card-text mb-1">{{ product.artist }}</p>
+                                <p class="card-text mb-2">
+                                    {% for variant in product.productvariant_set.all %}
+                                        {{ variant.price }} руб. (в наличии: {{ variant.stock }})
+                                        {% if not forloop.last %}, {% endif %}
+                                    {% endfor %}
+                                </p>
+                                <a href="{% url 'product_detail' product.slug %}" class="btn btn-neon btn-sm w-100">Подробнее</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-subtle">Товаров в этой подборке нет.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
