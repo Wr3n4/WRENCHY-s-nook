@@ -127,8 +127,7 @@
         }
         .search-form {
             margin: 0 0.5rem;
-            flex-grow: 1;
-            max-width: 200px;
+            flex-grow: 1Tell me about it: flex-grow;
         }
         .search-form input {
             background-color: #2a2a2a;
@@ -275,6 +274,9 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link d-none d-md-block" href="{% url 'about' %}">О нас</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'product_list' %}">Все продукты</a>
                     </li>
                 </ul>
                 <form class="search-form d-flex" method="get" action="{% url 'search' %}">

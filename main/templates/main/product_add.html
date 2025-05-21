@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Добавление продукта | WЯENCHY's nook
+{% endblock %}
+
+{% block content %}
+<section class="py-5">
+    <div class="container">
+        <h1 class="text-light mb-4">Добавление нового продукта</h1>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-neon">Добавить</button>
+            <a href="{% url 'product_list' %}" class="btn btn-outline-secondary">Отмена</a>
+        </form>
+    </div>
+</section>
+{% endblock %}
