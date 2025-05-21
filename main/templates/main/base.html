@@ -127,7 +127,7 @@
         }
         .search-form {
             margin: 0 0.5rem;
-            flex-grow: 1Tell me about it: flex-grow;
+            flex-grow: 1;
         }
         .search-form input {
             background-color: #2a2a2a;
@@ -151,6 +151,11 @@
         .text-subtle {
             color: #cccccc !important;
             opacity: 0.9;
+        }
+        .variant-form.new {
+            border-color: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+            transition: box-shadow 0.5s;
         }
         /* Адаптивность шапки */
         @media (max-width: 768px) {
@@ -275,9 +280,11 @@
                     <li class="nav-item">
                         <a class="nav-link d-none d-md-block" href="{% url 'about' %}">О нас</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'product_list' %}">Все продукты</a>
-                    </li>
+                    {% if user.is_staff %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'product_list' %}">Все продукты</a>
+                        </li>
+                    {% endif %}
                 </ul>
                 <form class="search-form d-flex" method="get" action="{% url 'search' %}">
                     <input class="form-control me-2" type="search" placeholder="Поиск по названию или исполнителю" aria-label="Search" name="q">

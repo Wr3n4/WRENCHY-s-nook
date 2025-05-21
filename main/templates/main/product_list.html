@@ -5,45 +5,47 @@
 {% endblock %}
 
 {% block content %}
-<section class="py-5">
-    <div class="container">
-        <h1 class="text-light mb-4">Все продукты</h1>
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
-            {% for product in products %}
-                <div class="col">
-                    <div class="card h-100 bg-dark text-light">
-                        <div class="product-image-container">
-                            {% if product.image %}
-                                <img src="{{ product.image.url }}" class="product-image" alt="{{ product.title }}">
-                            {% else %}
-                                <div class="no-image">
-                                    <span>Нет изображения</span>
-                                </div>
-                            {% endif %}
-                        </div>
-                        <div class="card-body p-2">
-                            <h5 class="card-title mb-1">{{ product.title }}</h5>
-                            <p class="card-text mb-1">{{ product.artist }}</p>
-                            <p class="card-text mb-2">
-                                {% for variant in product.productvariant_set.all %}
-                                    {{ variant.price }} руб. (в наличии: {{ variant.stock }})
-                                    {% if not forloop.last %}, {% endif %}
-                                {% endfor %}
-                            </p>
-                            <a href="{% url 'product_detail' product.slug %}" class="btn btn-neon btn-sm w-100 mb-1">Подробнее</a>
-                            <a href="{% url 'product_edit' product.slug %}" class="btn btn-neon btn-sm w-100 mb-1">Редактировать</a>
+<main class="container py-5">
+    <h1 class="text-light mb-4">Все продукты</h1>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-3">
+        {% for product in products %}
+            <div class="col">
+                <div class="card h-100 bg-dark text-light">
+                    <div class="product-image-container">
+                        {% if product.image %}
+                            <img src="{{ product.image.url }}" class="product-image" alt="{{ product.title }}">
+                        {% else %}
+                            <div class="no-image">
+                                <span>Нет изображения</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-body p-2">
+                        <h5 class="card-title mb-1">{{ product.title }}</h5>
+                        <p class="card-text mb-1">{{ product.artist }}</p>
+                        <p class="card-text mb-2">
+                            {% for variant in product.productvariant_set.all %}
+                                {{ variant.price }} руб. (в наличии: {{ variant.stock }})
+                                {% if not forloop.last %}, {% endif %}
+                            {% endfor %}
+                        </p>
+                        <a href="{% url 'product_detail' product.slug %}" class="btn btn-outline btn-neon btn-sm w-100 mb-1">Подробнее</a>
+                        {% if user.is_staff %}
+                            <a href="{% url 'product_edit' product.slug %}" class="btn btn-outline btn-neon btn-sm w-100 mb-1">Редактировать</a>
                             <form action="{% url 'product_delete' product.slug %}" method="post" style="display:inline;">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-neon btn-sm w-100" onclick="return confirm('Вы уверены, что хотите удалить {{ product.title }}?')">Удалить</button>
+                                <button type="submit" class="btn btn-outline btn-neon btn-sm w-100" onclick="return confirm('Вы уверены, что хотите удалить {{ product.title }}?')">Удалить</button>
                             </form>
-                        </div>
+                        {% endif %}
                     </div>
                 </div>
-            {% empty %}
-                <p class="text-subtle">Нет продуктов для отображения.</p>
-            {% endfor %}
-        </div>
-        <a href="{% url 'product_add' %}" class="btn btn-neon mt-4">Добавить новый продукт</a>
+            </div>
+        {% empty %}
+            <p class="text-subtle">Нет продуктов для отображения.</p>
+        {% endfor %}
     </div>
-</section>
+    {% if user.is_staff %}
+        <a href="{% url 'product_add' %}" class="btn btn-outline btn-neon mt-4">Добавить новый продукт</a>
+    {% endif %}
+</main>
 {% endblock %}

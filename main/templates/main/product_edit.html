@@ -8,12 +8,139 @@
 <section class="py-5">
     <div class="container">
         <h1 class="text-light mb-4">Редактирование продукта: {{ product.title }}</h1>
-        <form method="post">
+        {% if form.errors or variant_formset.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field in form %}
+                        {% for error in field.errors %}
+                            <li>{{ field.label }}: {{ error }}</li>
+                        {% endfor %}
+                    {% endfor %}
+                    {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                    {% for form in variant_formset %}
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <li>Вариант: {{ field.label }}: {{ error }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
-            {{ form.as_p }}
+            <div class="mb-3">
+                <label for="{{ form.title.id_for_label }}" class="form-label text-light">Название</label>
+                {{ form.title }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.artist.id_for_label }}" class="form-label text-light">Исполнитель</label>
+                {{ form.artist }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.description.id_for_label }}" class="form-label text-light">Описание</label>
+                {{ form.description }}
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.image.id_for_label }}" class="form-label text-light">Изображение</label>
+                {{ form.image }}
+                <small class="text-muted">Поддерживаются: JPEG, PNG, GIF. Максимальный размер: 5 МБ.</small>
+                <div id="image-preview" class="mt-2" style="max-width: 200px;">
+                    {% if form.instance.image %}
+                        <img src="{{ form.instance.image.url }}" alt="Превью изображения" class="img-fluid">
+                    {% endif %}
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="{{ form.slug.id_for_label }}" class="form-label text-light">URL-имя</label>
+                {{ form.slug }}
+                <small class="text-muted">Используйте только буквы, цифры, дефисы и подчеркивания, например, dark-side-of-the-moon</small>
+            </div>
+            <div class="mb-3">
+                <label class="form-label text-light">Жанры</label>
+                {{ form.genre }}
+            </div>
+            <div class="mb-3">
+                <h4 class="text-light">Варианты продукта</h4>
+                {{ variant_formset.management_form }}
+                <div id="variant-forms">
+                    {% for variant_form in variant_formset %}
+                        <div class="variant-form mb-3 p-3 border rounded bg-dark">
+                            {% if variant_form.instance.pk %}
+                                <h5 class="text-light">Вариант: {{ variant_form.instance.product_type.name }}</h5>
+                            {% else %}
+                                <h5 class="text-light">Новый вариант</h5>
+                            {% endif %}
+                            {% for hidden in variant_form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                            <div class="mb-2">
+                                <label for="{{ variant_form.product_type.id_for_label }}" class="form-label text-light">Тип товара</label>
+                                {{ variant_form.product_type }}
+                            </div>
+                            <div class="mb-2">
+                                <label for="{{ variant_form.price.id_for_label }}" class="form-label text-light">Цена (руб.)</label>
+                                {{ variant_form.price }}
+                            </div>
+                            <div class="mb-2">
+                                <label for="{{ variant_form.stock.id_for_label }}" class="form-label text-light">Количество на складе</label>
+                                {{ variant_form.stock }}
+                            </div>
+                            {% if variant_form.DELETE %}
+                                <div class="form-check mb-2">
+                                    {{ variant_form.DELETE }}
+                                    <label for="{{ variant_form.DELETE.id_for_label }}" class="form-check-label text-light">Удалить вариант</label>
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+                <button type="button" id="add-variant" class="btn btn-neon mb-3">Добавить вариант</button>
+            </div>
             <button type="submit" class="btn btn-neon">Сохранить</button>
             <a href="{% url 'product_detail' product.slug %}" class="btn btn-outline-secondary">Отмена</a>
         </form>
     </div>
 </section>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    document.getElementById('{{ form.image.id_for_label }}').addEventListener('change', function(event) {
+        const preview = document.getElementById('image-preview');
+        preview.innerHTML = '';
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                img.className = 'img-fluid';
+                img.alt = 'Превью изображения';
+                preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    $(document).ready(function() {
+        $('#add-variant').click(function() {
+            var formIdx = $('#id_form-TOTAL_FORMS').val();
+            var newForm = $('.variant-form:first').clone(true).get(0);
+            $(newForm).find('input, select').each(function() {
+                var newName = $(this).attr('name').replace('-0-', '-' + formIdx + '-');
+                var newId = 'id_' + newName;
+                $(this).attr('name', newName).attr('id', newId).val('');
+                if ($(this).is('input[type=checkbox]')) {
+                    $(this).prop('checked', false);
+                }
+            });
+            $(newForm).find('h5').text('Новый вариант');
+            $(newForm).find('.form-check').show(); // Показываем чекбокс удаления
+            $('#variant-forms').append(newForm);
+            $('#id_form-TOTAL_FORMS').val(parseInt(formIdx) + 1);
+        });
+    });
+</script>
 {% endblock %}

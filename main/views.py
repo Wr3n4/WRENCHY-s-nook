@@ -1,13 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import logout
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import models
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from .models import Product, Genre, ProductType, Cart, CartItem, Order, OrderItem, ProductVariant
-from .forms import ProductForm  # Будет создан ниже
+from .forms import ProductForm, ProductVariantFormSet
 
-# Вспомогательная функция для вычисления cart_items_count
 def get_cart_items_count(request):
     cart_items_count = 0
     user = request.user
@@ -21,7 +20,6 @@ def get_cart_items_count(request):
 def home(request):
     genres = Genre.objects.all()
     product_types = ProductType.objects.all()
-
     products = Product.objects.all()
     selected_genre = request.GET.get('genre')
     selected_type = request.GET.get('type')
@@ -110,6 +108,7 @@ def product_detail(request, slug):
     })
 
 @login_required
+@user_passes_test(lambda u: u.is_staff)
 def product_list(request):
     products = Product.objects.all()
     return render(request, 'main/product_list.html', {
@@ -118,23 +117,32 @@ def product_list(request):
     })
 
 @login_required
+@user_passes_test(lambda u: u.is_staff)
 def product_edit(request, slug):
     product = get_object_or_404(Product, slug=slug)
     if request.method == 'POST':
-        form = ProductForm(request.POST, instance=product)
-        if form.is_valid():
+        print(f"POST data: {request.POST}, FILES: {request.FILES}")  # Отладка
+        form = ProductForm(request.POST, request.FILES, instance=product)
+        variant_formset = ProductVariantFormSet(request.POST, instance=product)
+        if form.is_valid() and variant_formset.is_valid():
             form.save()
+            variant_formset.save()
             messages.success(request, f"Продукт '{product.title}' успешно обновлён.")
-            return redirect('product_detail', slug=slug)
+            return redirect('product_detail', slug=product.slug)
+        else:
+            print(f"Form errors: {form.errors}, Variant formset errors: {variant_formset.errors}")
     else:
         form = ProductForm(instance=product)
+        variant_formset = ProductVariantFormSet(instance=product)
     return render(request, 'main/product_edit.html', {
         'form': form,
+        'variant_formset': variant_formset,
         'product': product,
         'cart_items_count': get_cart_items_count(request),
     })
 
 @login_required
+@user_passes_test(lambda u: u.is_staff)
 def product_delete(request, slug):
     product = get_object_or_404(Product, slug=slug)
     if request.method == 'POST':
@@ -147,17 +155,26 @@ def product_delete(request, slug):
     })
 
 @login_required
+@user_passes_test(lambda u: u.is_staff)
 def product_add(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST)
-        if form.is_valid():
+        print(f"POST data: {request.POST}, FILES: {request.FILES}")  # Отладка
+        form = ProductForm(request.POST, request.FILES)
+        variant_formset = ProductVariantFormSet(request.POST)
+        if form.is_valid() and variant_formset.is_valid():
             product = form.save()
+            variant_formset.instance = product
+            variant_formset.save()
             messages.success(request, f"Новый продукт '{product.title}' успешно добавлен.")
             return redirect('product_detail', slug=product.slug)
+        else:
+            print(f"Form errors: {form.errors}, Variant formset errors: {variant_formset.errors}")
     else:
         form = ProductForm()
+        variant_formset = ProductVariantFormSet()
     return render(request, 'main/product_add.html', {
         'form': form,
+        'variant_formset': variant_formset,
         'cart_items_count': get_cart_items_count(request),
     })
 
