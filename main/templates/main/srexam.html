@@ -1,38 +1,59 @@
 {% extends 'base.html' %}
 
-{% block tittle%}
-Surmanov Rinat - Группа: 241-672 | Экзамен
-{% endblock %}
-
 {% block content %}
-<h2>Surmanov Rinat - Группа: 241-672</h2>
+<style>
+    .exam-image img {
+        max-width: 100%;
+        height: auto;
+        max-height: 300px;
+        display: block;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 5px;
+    }
 
-<h2>Опубликованные экзамены:</h2>
-<div class="exams-list">
-    {% for exam in exams %}
-    <div class="exam-card">
-        <h3>{{ exam.title }}</h3>
-        <p><strong>Дата создания:</strong> {{ exam.created_at|date:"d.m.Y H:i" }}</p>
-        <p><strong>Дата экзамена:</strong> {{ exam.exam_date|date:"d.m.Y H:i" }}</p>
-        
-        {% if exam.image %}
-        <div class="exam-image">
-            <img src="{{ exam.image.url }}" alt="{{ exam.title }}">
-        </div>
-        {% endif %}
+    .exam-card {
+        margin-bottom: 20px;
+        padding: 15px;
+        border: 1px solid #eee;
+        border-radius: 5px;
+    }
 
-        <div class="exam-users">
-            <h4>Участники:</h4>
-            <ul>
-                {% for user in exam.users.all %}
-                <li>{{ user.username }} ({{ user.email }})</li>
-                {% endfor %}
-            </ul>
+    .content-wrapper {
+        padding-top: 60px;
+
+</style>
+
+<div class="content-wrapper">
+    <h1>Surmanov Rinat - Группа: 241-672</h1>
+
+    <h2>Опубликованные экзамены:</h2>
+    <div class="exams-list container mt-5">
+        {% for exam in exams %}
+        <div class="exam-card">
+            <h3>{{ exam.title }}</h3>
+            <p><strong>Дата создания:</strong> {{ exam.created_at|date:"d.m.Y H:i" }}</p>
+            <p><strong>Дата экзамена:</strong> {{ exam.exam_date|date:"d.m.Y H:i" }}</p>
+
+            {% if exam.image %}
+            <div class="exam-image">
+                <img src="{{ exam.image.url }}" alt="{{ exam.title }}">
+            </div>
+            {% endif %}
+
+            <div class="exam-users">
+                <h4>Участники:</h4>
+                <ul>
+                    {% for user in exam.users.all %}
+                    <li>{{ user.username }} ({{ user.email }})</li>
+                    {% endfor %}
+                </ul>
+            </div>
         </div>
+        {% empty %}
+        <p>Нет опубликованных экзаменов.</p>
+        {% endfor %}
     </div>
-    <hr>
-    {% empty %}
-    <p>Нет опубликованных экзаменов.</p>
-    {% endfor %}
 </div>
 {% endblock %}
