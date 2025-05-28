@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django import forms
-from .models import ProductType, Genre, Product, ProductVariant, Order, OrderItem, Cart, CartItem
+from .models import ProductType, Genre, Product, ProductVariant, Order, OrderItem, Cart, CartItem, Srexam
 
 class ProductTypeForm(forms.ModelForm):
     class Meta:
@@ -123,3 +123,23 @@ class CartItemAdmin(admin.ModelAdmin):
     list_filter = ['cart__created_at']
     search_fields = ['product_variant__product__title']
     fields = ['cart', 'product_variant', 'quantity']
+
+@admin.register(Srexam)
+class SrexamAdmin(admin.ModelAdmin):
+    list_display = ('title', 'created_at', 'exam_date', 'is_public')
+    list_filter = ('is_public', 'created_at')
+    search_fields = ('title', 'users__email')
+    filter_horizontal = ('users',)
+    date_hierarchy = 'exam_date'
+    fieldsets = (
+        (None, {
+            'fields': ('title', 'image', 'is_public')
+        }),
+        ('Даты', {
+            'fields': ('created_at', 'exam_date'),
+        }),
+        ('Пользователи', {
+            'fields': ('users',),
+        }),
+    )
+    readonly_fields = ('created_at',)

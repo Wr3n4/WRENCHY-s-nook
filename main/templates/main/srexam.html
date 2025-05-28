@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block tittle%}
+Surmanov Rinat - Группа: 241-672 | Экзамен
+{% endblock %}
+
+{% block content %}
+<h2>Surmanov Rinat - Группа: 241-672</h2>
+
+<h2>Опубликованные экзамены:</h2>
+<div class="exams-list">
+    {% for exam in exams %}
+    <div class="exam-card">
+        <h3>{{ exam.title }}</h3>
+        <p><strong>Дата создания:</strong> {{ exam.created_at|date:"d.m.Y H:i" }}</p>
+        <p><strong>Дата экзамена:</strong> {{ exam.exam_date|date:"d.m.Y H:i" }}</p>
+        
+        {% if exam.image %}
+        <div class="exam-image">
+            <img src="{{ exam.image.url }}" alt="{{ exam.title }}">
+        </div>
+        {% endif %}
+
+        <div class="exam-users">
+            <h4>Участники:</h4>
+            <ul>
+                {% for user in exam.users.all %}
+                <li>{{ user.username }} ({{ user.email }})</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <hr>
+    {% empty %}
+    <p>Нет опубликованных экзаменов.</p>
+    {% endfor %}
+</div>
+{% endblock %}
