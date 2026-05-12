@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from .models import Product, Genre, ProductType, Cart, CartItem, Order, OrderItem, ProductVariant
 from .forms import ProductForm, ProductVariantFormSet
+from decimal import Decimal
 
 def get_cart_items_count(request):
     cart_items_count = 0
@@ -178,41 +179,74 @@ def product_add(request):
         'cart_items_count': get_cart_items_count(request),
     })
 
+
 @login_required
 def add_to_cart(request, slug):
     if request.method == 'POST':
         product = get_object_or_404(Product, slug=slug)
         variant_id = request.POST.get('variant')
         variant = get_object_or_404(ProductVariant, id=variant_id)
+
         if variant.stock < 1:
-            messages.error(request, f"Товар {product.title} ({variant.product_type.name}) закончился на складе.")
+            messages.error(request, f"Товар {product.title} закончился на складе.")
             return redirect('product_detail', slug=slug)
+
         cart, created = Cart.objects.get_or_create(user=request.user)
-        cart_item, created = CartItem.objects.get_or_create(cart=cart, product_variant=variant)
-        if not created:
+        cart_item, created = CartItem.objects.get_or_create(
+            cart=cart,
+            product_variant=variant
+        )
+        current_price = variant.price
+
+        if created:
+            cart_item.quantity = 1
+            cart_item.save()
+        else:
             if cart_item.quantity + 1 <= variant.stock:
                 cart_item.quantity += 1
                 cart_item.save()
             else:
-                messages.warning(request, f"Нельзя добавить больше {variant.stock} единиц {product.title}.")
+                messages.warning(request, f"Нельзя добавить больше {variant.stock} единиц.")
                 return redirect('product_detail', slug=slug)
-        else:
-            cart_item.quantity = 1
-            cart_item.save()
+
+        price_key = f'cart_price_{cart_item.id}'
+        request.session[price_key] = str(current_price)
+
         variant.stock -= 1
         variant.save()
-        messages.success(request, f"Добавлено в корзину: {product.title} ({variant.product_type.name})")
-    return redirect('home')
+
+        messages.success(request, f"Добавлено в корзину: {product.title}")
+
+    return redirect('cart')
 
 @login_required
 def cart(request):
-    cart = Cart.objects.filter(user=request.user).first()
-    cart_items = CartItem.objects.filter(cart=cart) if cart else []
-    cart_items_with_subtotal = [
-        {'item': item, 'subtotal': item.product_variant.price * item.quantity}
-        for item in cart_items
-    ]
-    total = sum(item['subtotal'] for item in cart_items_with_subtotal)
+    cart_obj = Cart.objects.filter(user=request.user).first()
+    cart_items = CartItem.objects.filter(cart=cart_obj) if cart_obj else []
+
+    cart_items_with_subtotal = []
+    total = 0
+
+    for item in cart_items:
+        # Получаем сохранённую цену из сессии
+        price_key = f'cart_price_{item.id}'
+        saved_price = request.session.get(price_key)
+
+        if saved_price:
+            price = Decimal(saved_price)
+        else:
+            # fallback — если цены нет в сессии
+            price = item.product_variant.price
+
+        subtotal = price * item.quantity
+
+        cart_items_with_subtotal.append({
+            'item': item,
+            'price': price,          # фиксированная цена
+            'subtotal': subtotal
+        })
+        total += subtotal
+
     return render(request, 'main/cart.html', {
         'cart_items_with_subtotal': cart_items_with_subtotal,
         'total': total,
