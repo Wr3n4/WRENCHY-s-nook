@@ -209,9 +209,11 @@ def add_to_cart(request, slug):
                 messages.warning(request, f"Нельзя добавить больше {variant.stock} единиц.")
                 return redirect('product_detail', slug=slug)
 
+        # Сохраняем цену в сессию (ключ: id CartItem)
         price_key = f'cart_price_{cart_item.id}'
         request.session[price_key] = str(current_price)
 
+        # Уменьшаем остаток
         variant.stock -= 1
         variant.save()
 
