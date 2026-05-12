@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import models
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from .models import Product, Genre, ProductType, Cart, CartItem, Order, OrderItem, ProductVariant, Srexam
+from .models import Product, Genre, ProductType, Cart, CartItem, Order, OrderItem, ProductVariant
 from .forms import ProductForm, ProductVariantFormSet
 
 def get_cart_items_count(request):
@@ -291,13 +291,3 @@ def custom_logout(request):
     logout(request)
     messages.success(request, "Вы успешно вышли из системы.")
     return redirect('home')
-
-def srexam_view(request):
-    exams = Srexam.objects.filter(is_public=True)
-    context = {
-        'exams': exams,
-        'fio': 'Surmanov Rinat',
-        'group': 'Ваш номер группы',  # Замените на реальный номер
-        'cart_items_count': get_cart_items_count(request),
-    }
-    return render(request, 'main/srexam.html', context)
