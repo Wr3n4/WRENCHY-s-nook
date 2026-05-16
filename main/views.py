@@ -7,6 +7,8 @@ from django.contrib.auth.forms import UserCreationForm
 from .models import Product, Genre, ProductType, Cart, CartItem, Order, OrderItem, ProductVariant
 from .forms import ProductForm, ProductVariantFormSet
 from decimal import Decimal
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 
 def get_cart_items_count(request):
     cart_items_count = 0
@@ -117,24 +119,33 @@ def product_list(request):
         'cart_items_count': get_cart_items_count(request),
     })
 
+
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def product_edit(request, slug):
     product = get_object_or_404(Product, slug=slug)
+
     if request.method == 'POST':
         print(f"POST data: {request.POST}, FILES: {request.FILES}")  # Отладка
-        form = ProductForm(request.POST, request.FILES, instance=product)
+
+        form = ProductForm(request.POST, request.FILES, instance=product)  # request.FILES
         variant_formset = ProductVariantFormSet(request.POST, instance=product)
+
         if form.is_valid() and variant_formset.is_valid():
             form.save()
             variant_formset.save()
+
             messages.success(request, f"Продукт '{product.title}' успешно обновлён.")
-            return redirect('product_detail', slug=product.slug)
+
+            # HttpResponseRedirect
+            return HttpResponseRedirect(reverse('product_detail', kwargs={'slug': product.slug}))
         else:
-            print(f"Form errors: {form.errors}, Variant formset errors: {variant_formset.errors}")
+            print(f"Form errors: {form.errors}")
+            print(f"Variant formset errors: {variant_formset.errors}")
     else:
         form = ProductForm(instance=product)
         variant_formset = ProductVariantFormSet(instance=product)
+
     return render(request, 'main/product_edit.html', {
         'form': form,
         'variant_formset': variant_formset,
@@ -155,24 +166,32 @@ def product_delete(request, slug):
         'cart_items_count': get_cart_items_count(request),
     })
 
+
 @login_required
 @user_passes_test(lambda u: u.is_staff)
 def product_add(request):
     if request.method == 'POST':
         print(f"POST data: {request.POST}, FILES: {request.FILES}")  # Отладка
-        form = ProductForm(request.POST, request.FILES)
+
+        form = ProductForm(request.POST, request.FILES)  # request.FILES
         variant_formset = ProductVariantFormSet(request.POST)
+
         if form.is_valid() and variant_formset.is_valid():
             product = form.save()
             variant_formset.instance = product
             variant_formset.save()
+
             messages.success(request, f"Новый продукт '{product.title}' успешно добавлен.")
-            return redirect('product_detail', slug=product.slug)
+
+            # Используем HttpResponseRedirect + reverse
+            return HttpResponseRedirect(reverse('product_detail', kwargs={'slug': product.slug}))
         else:
-            print(f"Form errors: {form.errors}, Variant formset errors: {variant_formset.errors}")
+            print(f"Form errors: {form.errors}")
+            print(f"Variant formset errors: {variant_formset.errors}")
     else:
         form = ProductForm()
         variant_formset = ProductVariantFormSet()
+
     return render(request, 'main/product_add.html', {
         'form': form,
         'variant_formset': variant_formset,

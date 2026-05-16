@@ -8,12 +8,32 @@ from django.core.files.uploadedfile import UploadedFile
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['title', 'artist', 'description', 'image', 'slug', 'genre']
+        fields = ['title', 'artist', 'description', 'genre', 'image', 'slug']
         widgets = {
-            'genre': forms.CheckboxSelectMultiple,
-            'description': forms.Textarea(attrs={'rows': 4}),
-            'slug': forms.TextInput(attrs={'placeholder': 'например, dark-side-of-the-moon'}),
-            'image': forms.FileInput(attrs={'accept': 'image/*'}),
+            'description': forms.Textarea(attrs={
+                'rows': 6,
+                'cols': 80,
+                'class': 'form-control bg-dark text-light',
+                'placeholder': 'Введите подробное описание товара...'
+            }),
+
+            'title': forms.TextInput(attrs={
+                'class': 'form-control bg-dark text-light'
+            }),
+            'artist': forms.TextInput(attrs={
+                'class': 'form-control bg-dark text-light'
+            }),
+            'slug': forms.TextInput(attrs={
+                'class': 'form-control bg-dark text-light'
+            }),
+        }
+        labels = {
+            'title': 'Название товара',
+            'artist': 'Исполнитель / Автор',
+            'description': 'Описание',
+            'genre': 'Жанр',
+            'image': 'Изображение товара',
+            'slug': 'Slug (для URL)',
         }
 
     def __init__(self, *args, **kwargs):
